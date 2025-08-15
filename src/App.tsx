@@ -2,7 +2,7 @@ import React from 'react';
 import TimeTracker from './components/TimeTracker';
 import './App.css';
 
-function App() {
+const App: React.FC = () => {
   return (
     <div className="App">
       <TimeTracker />

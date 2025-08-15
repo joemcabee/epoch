@@ -1,7 +1,9 @@
-// Storage utility for time tracking data
-const STORAGE_KEY = 'chronos_time_data';
+import { WeekData, TimeBlock } from '../types';
 
-export const getTimeData = () => {
+// Storage utility for time tracking data
+const STORAGE_KEY = 'epoch_time_data';
+
+export const getTimeData = (): Record<string, WeekData> => {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : {};
@@ -11,7 +13,7 @@ export const getTimeData = () => {
   }
 };
 
-export const saveTimeData = (data) => {
+export const saveTimeData = (data: Record<string, WeekData>): void => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (error) {
@@ -19,20 +21,20 @@ export const saveTimeData = (data) => {
   }
 };
 
-export const getWeekData = (weekStart) => {
+export const getWeekData = (weekStart: Date): WeekData => {
   const allData = getTimeData();
   const weekKey = weekStart.toISOString().split('T')[0];
   return allData[weekKey] || [];
 };
 
-export const saveWeekData = (weekStart, timeBlocks) => {
+export const saveWeekData = (weekStart: Date, timeBlocks: WeekData): void => {
   const allData = getTimeData();
   const weekKey = weekStart.toISOString().split('T')[0];
   allData[weekKey] = timeBlocks;
   saveTimeData(allData);
 };
 
-export const addTimeBlock = (weekStart, dayIndex, timeBlock) => {
+export const addTimeBlock = (weekStart: Date, dayIndex: number, timeBlock: Omit<TimeBlock, 'id'>): WeekData => {
   const weekData = getWeekData(weekStart);
   if (!weekData[dayIndex]) {
     weekData[dayIndex] = [];
@@ -40,12 +42,12 @@ export const addTimeBlock = (weekStart, dayIndex, timeBlock) => {
   weekData[dayIndex].push({
     ...timeBlock,
     id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
-  });
+  } as TimeBlock);
   saveWeekData(weekStart, weekData);
   return weekData;
 };
 
-export const removeTimeBlock = (weekStart, dayIndex, blockId) => {
+export const removeTimeBlock = (weekStart: Date, dayIndex: number, blockId: string): WeekData => {
   const weekData = getWeekData(weekStart);
   if (weekData[dayIndex]) {
     weekData[dayIndex] = weekData[dayIndex].filter(block => block.id !== blockId);

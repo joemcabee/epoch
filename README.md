@@ -1,4 +1,4 @@
-# Chronos - Time Tracker
+# Epoch - Time Tracker
 
 A modern React web application for tracking work time with browser storage. Built with Vite and React.
 
@@ -23,7 +23,7 @@ A modern React web application for tracking work time with browser storage. Buil
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd chronos
+cd epoch
 ```
 
 2. Install dependencies:

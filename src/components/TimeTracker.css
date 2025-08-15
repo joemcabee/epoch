@@ -1,5 +1,5 @@
 .time-tracker {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -11,7 +11,7 @@
 }
 
 .header h1 {
-  color: #2c3e50;
+  color: white;
   margin-bottom: 20px;
   font-size: 2.5rem;
   font-weight: 300;
@@ -43,15 +43,57 @@
 .week-display {
   font-size: 18px;
   font-weight: 500;
-  color: #34495e;
+  color: white;
   min-width: 200px;
+}
+
+.settings {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.weekend-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 10px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.weekend-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.weekend-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #3498db;
+}
+
+.checkbox-label {
+  font-size: 14px;
+  color: white;
+  font-weight: 500;
+  user-select: none;
 }
 
 .week-view {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(160px, 1fr));
   gap: 15px;
   margin-bottom: 30px;
+}
+
+.week-view.weekdays-only {
+  grid-template-columns: repeat(5, minmax(160px, 1fr));
 }
 
 .day-column {
@@ -119,16 +161,45 @@
 .week-summary {
   text-align: center;
   padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #764ba2;
   color: white;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .week-summary h2 {
-  margin: 0;
+  margin: 0 0 15px 0;
   font-size: 1.8rem;
   font-weight: 300;
+}
+
+.week-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 5px;
+  font-weight: 400;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 @media (max-width: 768px) {

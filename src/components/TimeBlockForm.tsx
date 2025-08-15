@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
+import { TimeBlockFormData } from '../types';
 import './TimeBlockForm.css';
 
-const TimeBlockForm = ({ onSubmit, onCancel }) => {
-  const [startTime, setStartTime] = useState('09:00');
+interface TimeBlockFormProps {
+  defaultStartTime?: string;
+  onSubmit: (data: TimeBlockFormData) => void;
+  onCancel: () => void;
+}
+
+const TimeBlockForm: React.FC<TimeBlockFormProps> = ({ defaultStartTime = '09:00', onSubmit, onCancel }) => {
+  const [startTime, setStartTime] = useState(defaultStartTime);
   const [endTime, setEndTime] = useState('17:00');
   const [description, setDescription] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!startTime || !endTime) {

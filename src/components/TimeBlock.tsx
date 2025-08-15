@@ -1,8 +1,14 @@
 import React from 'react';
 import { formatTimeBlock } from '../utils/dateUtils';
+import { TimeBlock as TimeBlockType } from '../types';
 import './TimeBlock.css';
 
-const TimeBlock = ({ block, onRemove }) => {
+interface TimeBlockProps {
+  block: TimeBlockType;
+  onRemove: (id: string) => void;
+}
+
+const TimeBlock: React.FC<TimeBlockProps> = ({ block, onRemove }) => {
   const duration = formatTimeBlock(block.startTime, block.endTime);
   const hours = Math.floor(duration / 60);
   const minutes = duration % 60;
