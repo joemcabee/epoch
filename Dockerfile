@@ -1,8 +1,5 @@
 FROM node:lts-alpine
 
-# Set environment to development to install all dependencies
-ENV NODE_ENV=development
-
 # Set the working directory
 WORKDIR /usr/src/app
 
@@ -15,7 +12,13 @@ RUN npm install --silent
 # Copy the rest of the application code
 COPY . .
 
-# Expose the port Vite runs on
+# Build the application for production
+RUN npm run build
+
+# Install a lightweight server to serve the built files
+RUN npm install -g serve
+
+# Expose the port
 EXPOSE 5173
 
 # Change ownership of the application files
@@ -24,5 +27,5 @@ RUN chown -R node /usr/src/app
 # Switch to the node user
 USER node
 
-# Start the development server
-CMD ["npm", "run", "dev"]
+# Start the production server
+CMD ["serve", "-s", "dist", "-l", "5173", "-n"]
