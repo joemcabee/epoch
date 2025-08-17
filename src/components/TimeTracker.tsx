@@ -11,7 +11,7 @@ const TimeTracker: React.FC = () => {
   const [weekData, setWeekData] = useState<WeekData>([]);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [showForm, setShowForm] = useState<boolean>(false);
-  const [showWeekends, setShowWeekends] = useState<boolean>(true);
+  const [showWeekends, setShowWeekends] = useState<boolean>(false);
 
   const weekDays = getWeekDays(currentWeek);
   const filteredWeekDays = showWeekends ? weekDays : weekDays.filter((_, index) => index < 5);
