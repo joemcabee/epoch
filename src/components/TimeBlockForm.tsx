@@ -1,17 +1,32 @@
-import React, { useState } from 'react';
-import { TimeBlockFormData } from '../types';
+import React, { useState, useEffect } from 'react';
+import { TimeBlockFormData, TimeBlock } from '../types';
 import './TimeBlockForm.css';
 
 interface TimeBlockFormProps {
   defaultStartTime?: string;
+  editingBlock?: TimeBlock;
   onSubmit: (data: TimeBlockFormData) => void;
   onCancel: () => void;
 }
 
-const TimeBlockForm: React.FC<TimeBlockFormProps> = ({ defaultStartTime = '09:00', onSubmit, onCancel }) => {
+const TimeBlockForm: React.FC<TimeBlockFormProps> = ({ 
+  defaultStartTime = '09:00', 
+  editingBlock,
+  onSubmit, 
+  onCancel 
+}) => {
   const [startTime, setStartTime] = useState(defaultStartTime);
   const [endTime, setEndTime] = useState('17:00');
   const [description, setDescription] = useState('');
+
+  // Initialize form with editing block data if provided
+  useEffect(() => {
+    if (editingBlock) {
+      setStartTime(editingBlock.startTime);
+      setEndTime(editingBlock.endTime);
+      setDescription(editingBlock.description || '');
+    }
+  }, [editingBlock]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,10 +48,12 @@ const TimeBlockForm: React.FC<TimeBlockFormProps> = ({ defaultStartTime = '09:00
     });
   };
 
+  const isEditing = !!editingBlock;
+
   return (
     <div className="form-overlay">
       <div className="form-modal">
-        <h2>Add Time Block</h2>
+        <h2>{isEditing ? 'Edit Time Block' : 'Add Time Block'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="startTime">Start Time:</label>
@@ -76,7 +93,7 @@ const TimeBlockForm: React.FC<TimeBlockFormProps> = ({ defaultStartTime = '09:00
               Cancel
             </button>
             <button type="submit" className="submit-btn">
-              Add Time Block
+              {isEditing ? 'Update Time Block' : 'Add Time Block'}
             </button>
           </div>
         </form>

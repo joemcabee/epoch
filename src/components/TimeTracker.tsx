@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { getWeekStart, getWeekDays, formatDate, isToday, formatTime } from '../utils/dateUtils';
-import { getWeekData, addTimeBlock, removeTimeBlock } from '../utils/storage';
-import { TimeBlockFormData, WeekData } from '../types';
+import { getWeekStart, getWeekDays, formatDate, isToday, formatTime, isFutureDate } from '../utils/dateUtils';
+import { getWeekData, addTimeBlock, removeTimeBlock, updateTimeBlock } from '../utils/storage';
+import { TimeBlockFormData, WeekData, TimeBlock as TimeBlockType } from '../types';
 import TimeBlockForm from './TimeBlockForm';
 import TimeBlock from './TimeBlock';
 import './TimeTracker.css';
@@ -12,6 +12,7 @@ const TimeTracker: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [showWeekends, setShowWeekends] = useState<boolean>(false);
+  const [editingBlock, setEditingBlock] = useState<TimeBlockType | null>(null);
 
   const weekDays = getWeekDays(currentWeek);
   const filteredWeekDays = showWeekends ? weekDays : weekDays.filter((_, index) => index < 5);
@@ -32,13 +33,33 @@ const TimeTracker: React.FC = () => {
     setSelectedDay(null);
   };
 
+  const handleUpdateTimeBlock = (timeBlock: TimeBlockFormData) => {
+    if (editingBlock && selectedDay !== null) {
+      const updatedData = updateTimeBlock(currentWeek, selectedDay, editingBlock.id, timeBlock);
+      setWeekData(updatedData);
+      setShowForm(false);
+      setSelectedDay(null);
+      setEditingBlock(null);
+    }
+  };
+
   const handleRemoveTimeBlock = (dayIndex: number, blockId: string) => {
     const updatedData = removeTimeBlock(currentWeek, dayIndex, blockId);
     setWeekData(updatedData);
   };
 
+  const handleEditTimeBlock = (block: TimeBlockType) => {
+    setEditingBlock(block);
+    setSelectedDay(weekDays.findIndex(day => {
+      const dayBlocks = weekData[weekDays.findIndex(d => d.toDateString() === day.toDateString())] || [];
+      return dayBlocks.some(b => b.id === block.id);
+    }));
+    setShowForm(true);
+  };
+
   const handleDayClick = (dayIndex: number) => {
     setSelectedDay(dayIndex);
+    setEditingBlock(null);
     setShowForm(true);
   };
 
@@ -83,6 +104,20 @@ const TimeTracker: React.FC = () => {
     }, 0);
   };
 
+  const handleFormSubmit = (data: TimeBlockFormData) => {
+    if (editingBlock) {
+      handleUpdateTimeBlock(data);
+    } else {
+      handleAddTimeBlock(data);
+    }
+  };
+
+  const handleFormCancel = () => {
+    setShowForm(false);
+    setSelectedDay(null);
+    setEditingBlock(null);
+  };
+
   return (
     <div className="time-tracker">
       <div className="header">
@@ -112,6 +147,7 @@ const TimeTracker: React.FC = () => {
           const dayBlocks = weekData[dayIndex] || [];
           const dayTotal = calculateDayTotal(dayIndex);
           const isCurrentDay = isToday(day);
+          const isFutureDay = isFutureDate(day);
 
           return (
             <div 
@@ -131,16 +167,19 @@ const TimeTracker: React.FC = () => {
                     key={block.id}
                     block={block}
                     onRemove={() => handleRemoveTimeBlock(dayIndex, block.id)}
+                    onEdit={handleEditTimeBlock}
                   />
                 ))}
               </div>
               
-              <button 
-                className="add-block-btn"
-                onClick={() => handleDayClick(dayIndex)}
-              >
-                + Add Time Block
-              </button>
+              {!isFutureDay && (
+                <button 
+                  className="add-block-btn"
+                  onClick={() => handleDayClick(dayIndex)}
+                >
+                  + Add Time Block
+                </button>
+              )}
             </div>
           );
         })}
@@ -161,12 +200,10 @@ const TimeTracker: React.FC = () => {
 
       {showForm && (
         <TimeBlockForm
-          defaultStartTime={selectedDay !== null ? getLastEndTime(selectedDay) : '09:00'}
-          onSubmit={handleAddTimeBlock}
-          onCancel={() => {
-            setShowForm(false);
-            setSelectedDay(null);
-          }}
+          defaultStartTime={selectedDay !== null && !editingBlock ? getLastEndTime(selectedDay) : '09:00'}
+          editingBlock={editingBlock || undefined}
+          onSubmit={handleFormSubmit}
+          onCancel={handleFormCancel}
         />
       )}
     </div>

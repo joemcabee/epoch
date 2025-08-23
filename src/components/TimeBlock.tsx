@@ -6,9 +6,10 @@ import './TimeBlock.css';
 interface TimeBlockProps {
   block: TimeBlockType;
   onRemove: (id: string) => void;
+  onEdit: (block: TimeBlockType) => void;
 }
 
-const TimeBlock: React.FC<TimeBlockProps> = ({ block, onRemove }) => {
+const TimeBlock: React.FC<TimeBlockProps> = ({ block, onRemove, onEdit }) => {
   const duration = formatTimeBlock(block.startTime, block.endTime);
   const hours = Math.floor(duration / 60);
   const minutes = duration % 60;
@@ -19,13 +20,22 @@ const TimeBlock: React.FC<TimeBlockProps> = ({ block, onRemove }) => {
         <span className="time-range">
           {block.startTime} - {block.endTime}
         </span>
-        <button 
-          className="remove-btn"
-          onClick={() => onRemove(block.id)}
-          title="Remove time block"
-        >
-          ×
-        </button>
+        <div className="time-block-actions">
+          <button 
+            className="edit-btn"
+            onClick={() => onEdit(block)}
+            title="Edit time block"
+          >
+            ✏️
+          </button>
+          <button 
+            className="remove-btn"
+            onClick={() => onRemove(block.id)}
+            title="Remove time block"
+          >
+            ×
+          </button>
+        </div>
       </div>
       <div className="time-block-duration">
         {hours > 0 && `${hours}h`}

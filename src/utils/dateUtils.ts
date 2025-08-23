@@ -42,3 +42,11 @@ export const isToday = (date: Date): boolean => {
   const today = new Date();
   return date.toDateString() === today.toDateString();
 };
+
+export const isFutureDate = (date: Date): boolean => {
+  const today = new Date();
+  // Reset time to start of day for accurate comparison
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const dateStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  return dateStart > todayStart;
+};

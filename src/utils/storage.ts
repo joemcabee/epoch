@@ -55,3 +55,16 @@ export const removeTimeBlock = (weekStart: Date, dayIndex: number, blockId: stri
   }
   return weekData;
 };
+
+export const updateTimeBlock = (weekStart: Date, dayIndex: number, blockId: string, updatedData: Omit<TimeBlock, 'id'>): WeekData => {
+  const weekData = getWeekData(weekStart);
+  if (weekData[dayIndex]) {
+    weekData[dayIndex] = weekData[dayIndex].map(block => 
+      block.id === blockId 
+        ? { ...updatedData, id: blockId }
+        : block
+    );
+    saveWeekData(weekStart, weekData);
+  }
+  return weekData;
+};
