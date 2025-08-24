@@ -20,7 +20,7 @@ const TimeBlock: React.FC<TimeBlockProps> = ({ block, onRemove, onEdit }) => {
     <div className={`time-block ${isActive ? 'active-session' : ''}`}>
       <div className="time-block-header">
         <span className="time-range">
-          {block.startTime} {block.endTime ? `- ${block.endTime}` : '- Active'}
+          {block.startTime} {block.endTime ? `- ${block.endTime}` : ''}
         </span>
         <div className="time-block-actions">
           {!isActive && (
@@ -51,7 +51,7 @@ const TimeBlock: React.FC<TimeBlockProps> = ({ block, onRemove, onEdit }) => {
           </>
         )}
       </div>
-      {block.description && (
+      {block.description && !isActive && (
         <div className="time-block-description">
           {block.description}
         </div>
