@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { getWeekStart, getWeekDays, formatDate, isToday, formatTime, isFutureDate } from '../utils/dateUtils';
-import { getWeekData, addTimeBlock, removeTimeBlock, updateTimeBlock } from '../utils/storage';
-import { TimeBlockFormData, WeekData, TimeBlock as TimeBlockType } from '../types';
+import { getWeekStart, getWeekDays, formatDate, isToday, formatTime, isFutureDate, getCurrentTime } from '../utils/dateUtils';
+import { getWeekData, addTimeBlock, removeTimeBlock, updateTimeBlock, getClockState, clockIn, clockOut } from '../utils/storage';
+import { TimeBlockFormData, WeekData, TimeBlock as TimeBlockType, ClockState } from '../types';
 import TimeBlockForm from './TimeBlockForm';
 import TimeBlock from './TimeBlock';
+import ClockInOut from './ClockInOut';
 import './TimeTracker.css';
 
 const TimeTracker: React.FC = () => {
@@ -13,17 +14,24 @@ const TimeTracker: React.FC = () => {
   const [showForm, setShowForm] = useState<boolean>(false);
   const [showWeekends, setShowWeekends] = useState<boolean>(false);
   const [editingBlock, setEditingBlock] = useState<TimeBlockType | null>(null);
+  const [clockState, setClockState] = useState<ClockState>({ isClockedIn: false });
 
   const weekDays = getWeekDays(currentWeek);
   const filteredWeekDays = showWeekends ? weekDays : weekDays.filter((_, index) => index < 5);
 
   useEffect(() => {
     loadWeekData();
+    loadClockState();
   }, [currentWeek]);
 
   const loadWeekData = () => {
     const data = getWeekData(currentWeek);
     setWeekData(data);
+  };
+
+  const loadClockState = () => {
+    const state = getClockState();
+    setClockState(state);
   };
 
   const handleAddTimeBlock = (timeBlock: TimeBlockFormData) => {
@@ -63,6 +71,28 @@ const TimeTracker: React.FC = () => {
     setShowForm(true);
   };
 
+  const handleClockIn = () => {
+    const todayIndex = weekDays.findIndex(day => isToday(day));
+    if (todayIndex !== -1) {
+      const currentTime = getCurrentTime();
+      const { weekData: updatedWeekData, clockState: updatedClockState } = clockIn(currentWeek, todayIndex, currentTime);
+      setWeekData(updatedWeekData);
+      setClockState(updatedClockState);
+    }
+  };
+
+  const handleClockOut = () => {
+    if (clockState.activeBlockId) {
+      const todayIndex = weekDays.findIndex(day => isToday(day));
+      if (todayIndex !== -1) {
+        const currentTime = getCurrentTime();
+        const { weekData: updatedWeekData, clockState: updatedClockState } = clockOut(currentWeek, todayIndex, clockState.activeBlockId, currentTime);
+        setWeekData(updatedWeekData);
+        setClockState(updatedClockState);
+      }
+    }
+  };
+
   const getLastEndTime = (dayIndex: number): string => {
     const dayBlocks = weekData[dayIndex] || [];
     if (dayBlocks.length === 0) return '09:00';
@@ -72,7 +102,8 @@ const TimeTracker: React.FC = () => {
       return new Date(`2000-01-01T${a.startTime}`).getTime() - new Date(`2000-01-01T${b.startTime}`).getTime();
     });
     
-    return sortedBlocks[sortedBlocks.length - 1].endTime;
+    const lastBlock = sortedBlocks[sortedBlocks.length - 1];
+    return lastBlock.endTime || lastBlock.startTime;
   };
 
   const handlePreviousWeek = () => {
@@ -90,6 +121,7 @@ const TimeTracker: React.FC = () => {
   const calculateDayTotal = (dayIndex: number): number => {
     const dayBlocks = weekData[dayIndex] || [];
     return dayBlocks.reduce((total, block) => {
+      if (!block.endTime) return total; // Skip active sessions in total calculation
       const start = new Date(`2000-01-01T${block.startTime}`);
       const end = new Date(`2000-01-01T${block.endTime}`);
       const diffMs = end.getTime() - start.getTime();
@@ -160,6 +192,13 @@ const TimeTracker: React.FC = () => {
                   Total: {formatTime(dayTotal)}
                 </div>
               </div>
+              
+              <ClockInOut
+                isCurrentDay={isCurrentDay}
+                clockState={clockState}
+                onClockIn={handleClockIn}
+                onClockOut={handleClockOut}
+              />
               
               <div className="time-blocks">
                 {dayBlocks.map((block) => (

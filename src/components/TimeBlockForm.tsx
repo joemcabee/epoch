@@ -23,7 +23,7 @@ const TimeBlockForm: React.FC<TimeBlockFormProps> = ({
   useEffect(() => {
     if (editingBlock) {
       setStartTime(editingBlock.startTime);
-      setEndTime(editingBlock.endTime);
+      setEndTime(editingBlock.endTime || '17:00');
       setDescription(editingBlock.description || '');
     }
   }, [editingBlock]);
@@ -31,19 +31,19 @@ const TimeBlockForm: React.FC<TimeBlockFormProps> = ({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (!startTime || !endTime) {
-      alert('Please enter both start and end times');
+    if (!startTime) {
+      alert('Please enter a start time');
       return;
     }
 
-    if (startTime >= endTime) {
+    if (endTime && startTime >= endTime) {
       alert('End time must be after start time');
       return;
     }
 
     onSubmit({
       startTime,
-      endTime,
+      endTime: endTime || '',
       description: description.trim() || 'Work'
     });
   };
@@ -67,13 +67,12 @@ const TimeBlockForm: React.FC<TimeBlockFormProps> = ({
           </div>
 
           <div className="form-group">
-            <label htmlFor="endTime">End Time:</label>
+            <label htmlFor="endTime">End Time (optional):</label>
             <input
               type="time"
               id="endTime"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              required
             />
           </div>
 

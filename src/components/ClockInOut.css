@@ -1,0 +1,43 @@
+.clock-in-out {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.clock-in-btn,
+.clock-out-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.clock-in-btn {
+  background: #27ae60;
+  color: white;
+}
+
+.clock-in-btn:hover {
+  background: #229954;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+}
+
+.clock-out-btn {
+  background: #e74c3c;
+  color: white;
+}
+
+.clock-out-btn:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.clock-in-btn:active,
+.clock-out-btn:active {
+  transform: translateY(0);
+}
