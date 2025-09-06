@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getWeekStart, getWeekDays, formatDate, isToday, formatTime, isFutureDate, getCurrentTime } from '../utils/dateUtils';
+import { getWeekStart, getWeekDays, formatDate, isToday, formatTime, isFutureDate, getCurrentTime, getTimeInDecimalFormat } from '../utils/dateUtils';
 import { getWeekData, addTimeBlock, removeTimeBlock, updateTimeBlock, getClockState, clockIn, clockOut } from '../utils/storage';
 import { TimeBlockFormData, WeekData, TimeBlock as TimeBlockType, ClockState } from '../types';
 import TimeBlockForm from './TimeBlockForm';
@@ -180,6 +180,7 @@ const TimeTracker: React.FC = () => {
           const dayTotal = calculateDayTotal(dayIndex);
           const isCurrentDay = isToday(day);
           const isFutureDay = isFutureDate(day);
+          const dayTotalInDecimal = getTimeInDecimalFormat(dayTotal);
 
           return (
             <div 
@@ -190,15 +191,10 @@ const TimeTracker: React.FC = () => {
                 <h3>{formatDate(day)}</h3>
                 <div className="day-total">
                   Total: {formatTime(dayTotal)}
+                  <br/>
+                  ({dayTotalInDecimal})
                 </div>
               </div>
-              
-              <ClockInOut
-                isCurrentDay={isCurrentDay}
-                clockState={clockState}
-                onClockIn={handleClockIn}
-                onClockOut={handleClockOut}
-              />
               
               <div className="time-blocks">
                 {dayBlocks.map((block) => (
@@ -210,6 +206,13 @@ const TimeTracker: React.FC = () => {
                   />
                 ))}
               </div>
+              
+              <ClockInOut
+                isCurrentDay={isCurrentDay}
+                clockState={clockState}
+                onClockIn={handleClockIn}
+                onClockOut={handleClockOut}
+              />
               
               {!isFutureDay && (
                 <button 

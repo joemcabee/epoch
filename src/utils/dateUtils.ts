@@ -22,6 +22,10 @@ export const formatTime = (minutes: number): string => {
   return `${hours}h ${mins}m`;
 };
 
+export const getTimeInDecimalFormat = (minutes: number): string => {
+  return (minutes / 60).toFixed(2);
+};
+
 export const formatTimeBlock = (startTime: string, endTime: string): number => {
   const start = new Date(`2000-01-01T${startTime}`);
   const end = new Date(`2000-01-01T${endTime}`);
