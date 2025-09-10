@@ -20,13 +20,24 @@ const TimeTracker: React.FC = () => {
   const filteredWeekDays = showWeekends ? weekDays : weekDays.filter((_, index) => index < 5);
 
   useEffect(() => {
-    loadWeekData();
-    loadClockState();
+    try {
+      loadWeekData();
+      loadClockState();
+    } catch (error) {
+      console.error('Error loading data:', error);
+      // Optionally show user-friendly error message
+    }
   }, [currentWeek]);
 
   const loadWeekData = () => {
-    const data = getWeekData(currentWeek);
-    setWeekData(data);
+    try {
+      const data = getWeekData(currentWeek);
+      console.log('Loaded week data for', currentWeek.toLocaleDateString(), ':', data);
+      setWeekData(data);
+    } catch (error) {
+      console.error('Failed to load week data:', error);
+      setWeekData([]);
+    }
   };
 
   const loadClockState = () => {

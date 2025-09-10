@@ -3,7 +3,11 @@ export const getWeekStart = (date: Date = new Date()): Date => {
   const d = new Date(date);
   const day = d.getDay();
   const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-  return new Date(d.setDate(diff));
+  const weekStart = new Date(d);
+  weekStart.setDate(diff);
+  // Reset time to start of day to avoid time zone issues
+  weekStart.setHours(0, 0, 0, 0);
+  return weekStart;
 };
 
 export const getWeekDays = (weekStart: Date): Date[] => {
@@ -44,7 +48,10 @@ export const formatDate = (date: Date): string => {
 
 export const isToday = (date: Date): boolean => {
   const today = new Date();
-  return date.toDateString() === today.toDateString();
+  // Reset both dates to start of day for accurate comparison
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const dateStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  return dateStart.getTime() === todayStart.getTime();
 };
 
 export const isFutureDate = (date: Date): boolean => {

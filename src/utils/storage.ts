@@ -33,13 +33,15 @@ export const saveTimeData = (data: Record<string, WeekData>): void => {
 
 export const getWeekData = (weekStart: Date): WeekData => {
   const allData = getTimeData();
-  const weekKey = weekStart.toISOString().split('T')[0];
+  // Use local date string instead of UTC to avoid time zone issues
+  const weekKey = weekStart.toLocaleDateString('en-CA'); // YYYY-MM-DD format[]
   return allData[weekKey] || [];
 };
 
 export const saveWeekData = (weekStart: Date, timeBlocks: WeekData): void => {
   const allData = getTimeData();
-  const weekKey = weekStart.toISOString().split('T')[0];
+  // Use local date string instead of UTC to avoid time zone issues
+  const weekKey = weekStart.toLocaleDateString('en-CA'); // YYYY-MM-DD format
   allData[weekKey] = timeBlocks;
   saveTimeData(allData);
 };
