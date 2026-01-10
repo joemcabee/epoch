@@ -29,6 +29,28 @@ const TimeTracker: React.FC = () => {
     }
   }, [currentWeek]);
 
+  // Automatically show weekends when week data is loaded if weekend data exists
+  useEffect(() => {
+    const hasWeekendData = (weekData[5] && weekData[5].length > 0) || (weekData[6] && weekData[6].length > 0);
+    if (hasWeekendData) {
+      setShowWeekends(true);
+    }
+  }, [weekData]);
+
+  // Automatically show weekends if viewing current week and clock is active
+  useEffect(() => {
+    const isCurrentWeek = (() => {
+      const currentWeekStart = getWeekStart();
+      const currentWeekStartDate = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth(), currentWeekStart.getDate());
+      const displayedWeekStartDate = new Date(currentWeek.getFullYear(), currentWeek.getMonth(), currentWeek.getDate());
+      return currentWeekStartDate.getTime() === displayedWeekStartDate.getTime();
+    })();
+
+    if (isCurrentWeek && clockState.isClockedIn) {
+      setShowWeekends(true);
+    }
+  }, [clockState.isClockedIn, currentWeek]);
+
   const loadWeekData = () => {
     try {
       const data = getWeekData(currentWeek);
