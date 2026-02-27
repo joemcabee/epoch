@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { getWeekStart, getWeekDays, formatDate, isToday, formatTime, isFutureDate, getCurrentTime, getTimeInDecimalFormat } from '../utils/dateUtils';
-import { getWeekData, addTimeBlock, removeTimeBlock, updateTimeBlock, getClockState, clockIn, clockOut } from '../utils/storage';
-import { TimeBlockFormData, WeekData, TimeBlock as TimeBlockType, ClockState } from '../types';
+import { getWeekData, addTimeBlock, removeTimeBlock, updateTimeBlock, getClockState, clockIn, clockOut, getStandardBlocks, saveStandardBlocks } from '../utils/storage';
+import { TimeBlockFormData, WeekData, TimeBlock as TimeBlockType, ClockState, StandardTimeBlock } from '../types';
 import TimeBlockForm from './TimeBlockForm';
 import TimeBlock from './TimeBlock';
 import ClockInOut from './ClockInOut';
+import ConfigScreen from './ConfigScreen';
 import './TimeTracker.css';
 
 const TimeTracker: React.FC = () => {
@@ -15,6 +16,8 @@ const TimeTracker: React.FC = () => {
   const [showWeekends, setShowWeekends] = useState<boolean>(false);
   const [editingBlock, setEditingBlock] = useState<TimeBlockType | null>(null);
   const [clockState, setClockState] = useState<ClockState>({ isClockedIn: false });
+  const [standardBlocks, setStandardBlocks] = useState<StandardTimeBlock[]>([]);
+  const [showConfig, setShowConfig] = useState<boolean>(false);
 
   const weekDays = getWeekDays(currentWeek);
   const filteredWeekDays = showWeekends ? weekDays : weekDays.filter((_, index) => index < 5);
@@ -23,6 +26,7 @@ const TimeTracker: React.FC = () => {
     try {
       loadWeekData();
       loadClockState();
+      setStandardBlocks(getStandardBlocks());
     } catch (error) {
       console.error('Error loading data:', error);
       // Optionally show user-friendly error message
@@ -183,6 +187,32 @@ const TimeTracker: React.FC = () => {
     setEditingBlock(null);
   };
 
+  const handleSaveConfig = (blocks: StandardTimeBlock[]) => {
+    saveStandardBlocks(blocks);
+    setStandardBlocks(blocks);
+    setShowConfig(false);
+  };
+
+  const handleAddStandardBlocks = (dayIndex: number) => {
+    const dayBlocks = weekData[dayIndex] || [];
+    let updatedData = { ...weekData };
+
+    for (const std of standardBlocks) {
+      const alreadyExists = dayBlocks.some(
+        b => b.startTime === std.startTime && b.endTime === std.endTime
+      );
+      if (!alreadyExists) {
+        updatedData = addTimeBlock(currentWeek, dayIndex, {
+          startTime: std.startTime,
+          endTime: std.endTime,
+          description: std.description,
+        });
+      }
+    }
+
+    setWeekData(updatedData);
+  };
+
   return (
     <div className="time-tracker">
       <div className="header">
@@ -204,6 +234,13 @@ const TimeTracker: React.FC = () => {
             />
             <span className="checkbox-label">Show weekends (Saturday & Sunday)</span>
           </label>
+          <button
+            className="config-btn"
+            onClick={() => setShowConfig(true)}
+            title="Configuration"
+          >
+            ⚙️
+          </button>
         </div>
       </div>
 
@@ -246,13 +283,22 @@ const TimeTracker: React.FC = () => {
                 onClockIn={handleClockIn}
                 onClockOut={handleClockOut}
               />
-              
+
               {!isFutureDay && (
                 <button 
                   className="add-block-btn"
                   onClick={() => handleDayClick(dayIndex)}
                 >
                   + Add Time Block
+                </button>
+              )}
+              
+              {!isFutureDay && standardBlocks.length > 0 && (
+                <button
+                  className="add-standard-btn"
+                  onClick={() => handleAddStandardBlocks(dayIndex)}
+                >
+                  + Add Standard Blocks
                 </button>
               )}
             </div>
@@ -279,6 +325,14 @@ const TimeTracker: React.FC = () => {
           editingBlock={editingBlock || undefined}
           onSubmit={handleFormSubmit}
           onCancel={handleFormCancel}
+        />
+      )}
+
+      {showConfig && (
+        <ConfigScreen
+          initialBlocks={standardBlocks}
+          onSave={handleSaveConfig}
+          onCancel={() => setShowConfig(false)}
         />
       )}
     </div>

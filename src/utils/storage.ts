@@ -1,8 +1,9 @@
-import { WeekData, TimeBlock, ClockState } from '../types';
+import { WeekData, TimeBlock, ClockState, StandardTimeBlock } from '../types';
 
 // Storage utility for time tracking data
 const STORAGE_KEY = 'epoch_time_data';
 const CLOCK_STATE_KEY = 'epoch_clock_state';
+const STANDARD_BLOCKS_KEY = 'epoch_standard_blocks';
 
 // Helper function to sort time blocks by start time
 const sortTimeBlocks = (timeBlocks: TimeBlock[]): TimeBlock[] => {
@@ -136,6 +137,25 @@ export const clockIn = (weekStart: Date, dayIndex: number, startTime: string): {
   saveClockState(clockState);
   
   return { weekData, clockState };
+};
+
+// Standard time blocks configuration
+export const getStandardBlocks = (): StandardTimeBlock[] => {
+  try {
+    const data = localStorage.getItem(STANDARD_BLOCKS_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Error reading standard blocks from localStorage:', error);
+    return [];
+  }
+};
+
+export const saveStandardBlocks = (blocks: StandardTimeBlock[]): void => {
+  try {
+    localStorage.setItem(STANDARD_BLOCKS_KEY, JSON.stringify(blocks));
+  } catch (error) {
+    console.error('Error saving standard blocks to localStorage:', error);
+  }
 };
 
 export const clockOut = (weekStart: Date, dayIndex: number, blockId: string, endTime: string): { weekData: WeekData; clockState: ClockState } => {

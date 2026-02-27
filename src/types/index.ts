@@ -21,3 +21,10 @@ export interface ClockState {
   activeBlockId?: string;
   startTime?: string;
 }
+
+export interface StandardTimeBlock {
+  id: string;
+  startTime: string;
+  endTime: string;
+  description: string;
+}

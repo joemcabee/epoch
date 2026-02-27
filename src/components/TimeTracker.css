@@ -71,6 +71,23 @@
   transform: translateY(-1px);
 }
 
+.config-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  transition: all 0.2s ease;
+  margin-left: 15px;
+}
+
+.config-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
 .weekend-toggle input[type="checkbox"] {
   width: 18px;
   height: 18px;
@@ -152,10 +169,29 @@
   font-size: 14px;
   font-weight: 500;
   transition: background-color 0.2s;
+  margin-bottom: 12px;
 }
 
 .add-block-btn:hover {
   background: #229954;
+}
+
+.add-standard-btn {
+  width: 100%;
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  margin-bottom: 12px;
+}
+
+.add-standard-btn:hover {
+  background: #2980b9;
 }
 
 .week-summary {
