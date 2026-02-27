@@ -105,7 +105,6 @@
   font-size: 14px;
   font-family: inherit;
   transition: border-color 0.2s;
-  width: 110px;
 }
 
 .config-add-row input[type="time"]:focus {
