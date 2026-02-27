@@ -185,3 +185,8 @@ export const clockOut = (weekStart: Date, dayIndex: number, blockId: string, end
   
   return { weekData, clockState };
 };
+
+// Expose all stored weeks for history and analysis
+export const getAllWeekData = (): Record<string, WeekData> => {
+  return getTimeData();
+};

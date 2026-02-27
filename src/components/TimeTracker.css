@@ -71,7 +71,8 @@
   transform: translateY(-1px);
 }
 
-.config-btn {
+.history-btn,
+  .config-btn {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
@@ -81,6 +82,12 @@
   line-height: 1;
   transition: all 0.2s ease;
   margin-left: 15px;
+}
+
+  .history-btn:hover,
+  .config-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
 }
 
 .config-btn:hover {

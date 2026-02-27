@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getWeekStart, getWeekDays, formatDate, isToday, formatTime, isFutureDate, getCurrentTime, getTimeInDecimalFormat } from '../utils/dateUtils';
-import { getWeekData, addTimeBlock, removeTimeBlock, updateTimeBlock, getClockState, clockIn, clockOut, getStandardBlocks, saveStandardBlocks } from '../utils/storage';
+import { getWeekData, addTimeBlock, removeTimeBlock, updateTimeBlock, getClockState, clockIn, clockOut, getStandardBlocks, saveStandardBlocks, getAllWeekData } from '../utils/storage';
 import { TimeBlockFormData, WeekData, TimeBlock as TimeBlockType, ClockState, StandardTimeBlock } from '../types';
 import TimeBlockForm from './TimeBlockForm';
 import TimeBlock from './TimeBlock';
 import ClockInOut from './ClockInOut';
 import ConfigScreen from './ConfigScreen';
+import HistoryModal, { WeekHistoryEntry } from './HistoryModal';
 import './TimeTracker.css';
 
 const TimeTracker: React.FC = () => {
@@ -18,6 +19,10 @@ const TimeTracker: React.FC = () => {
   const [clockState, setClockState] = useState<ClockState>({ isClockedIn: false });
   const [standardBlocks, setStandardBlocks] = useState<StandardTimeBlock[]>([]);
   const [showConfig, setShowConfig] = useState<boolean>(false);
+  const [showHistory, setShowHistory] = useState<boolean>(false);
+  const [historyEntries, setHistoryEntries] = useState<WeekHistoryEntry[]>([]);
+  const [historyPage, setHistoryPage] = useState<number>(1);
+  const HISTORY_PAGE_SIZE = 4;
 
   const weekDays = getWeekDays(currentWeek);
   const filteredWeekDays = showWeekends ? weekDays : weekDays.filter((_, index) => index < 5);
@@ -193,6 +198,61 @@ const TimeTracker: React.FC = () => {
     setShowConfig(false);
   };
 
+  // ---------- history helpers ----------
+  const computeWeekStats = (weekData: WeekData): { totalMinutes: number; daysWorked: number } => {
+    let total = 0;
+    let daysWorked = 0;
+    for (let i = 0; i < 7; i++) {
+      const dayBlocks = weekData[i] || [];
+      if (dayBlocks.length > 0) {
+        daysWorked++;
+      }
+      total += dayBlocks.reduce((subtotal, block) => {
+        if (!block.endTime) return subtotal;
+        const start = new Date(`2000-01-01T${block.startTime}`);
+        const end = new Date(`2000-01-01T${block.endTime}`);
+        const diffMs = end.getTime() - start.getTime();
+        const diffMin = Math.floor(diffMs / (1000 * 60));
+        return subtotal + diffMin;
+      }, 0);
+    }
+    return { totalMinutes: total, daysWorked };
+  };
+
+  const loadHistory = () => {
+    const allData = getAllWeekData();
+    const entries: WeekHistoryEntry[] = Object.keys(allData)
+      .map(key => {
+        const start = new Date(key);
+        const weekData = allData[key];
+        const stats = computeWeekStats(weekData);
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6);
+        return {
+          start,
+          end,
+          totalMinutes: stats.totalMinutes,
+          daysWorked: stats.daysWorked,
+        };
+      })
+      .sort((a, b) => b.start.getTime() - a.start.getTime());
+
+    setHistoryEntries(entries);
+    setHistoryPage(1);
+  };
+
+  const handleOpenHistory = () => {
+    loadHistory();
+    setShowHistory(true);
+  };
+
+  const handleLoadMoreHistory = () => {
+    setHistoryPage(prev => prev + 1);
+  };
+
+  const displayedHistory = historyEntries.slice(0, historyPage * HISTORY_PAGE_SIZE);
+  const hasMoreHistory = historyEntries.length > displayedHistory.length;
+
   const handleAddStandardBlocks = (dayIndex: number) => {
     const dayBlocks = weekData[dayIndex] || [];
     let updatedData = { ...weekData };
@@ -234,6 +294,13 @@ const TimeTracker: React.FC = () => {
             />
             <span className="checkbox-label">Show weekends (Saturday & Sunday)</span>
           </label>
+          <button
+            className="history-btn"
+            onClick={handleOpenHistory}
+            title="History"
+          >
+            📊
+          </button>
           <button
             className="config-btn"
             onClick={() => setShowConfig(true)}
@@ -333,6 +400,15 @@ const TimeTracker: React.FC = () => {
           initialBlocks={standardBlocks}
           onSave={handleSaveConfig}
           onCancel={() => setShowConfig(false)}
+        />
+      )}
+
+      {showHistory && (
+        <HistoryModal
+          entries={displayedHistory}
+          onClose={() => setShowHistory(false)}
+          onLoadMore={handleLoadMoreHistory}
+          hasMore={hasMoreHistory}
         />
       )}
     </div>
