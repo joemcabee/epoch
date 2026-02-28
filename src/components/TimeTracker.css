@@ -36,6 +36,14 @@
   transition: background-color 0.2s;
 }
 
+.week-navigation .current-btn {
+  background: #3498db;
+  margin: 0 8px;
+}
+.week-navigation .current-btn:hover {
+  background: #2980b9;
+}
+
 .week-navigation button:hover {
   background: #6a4190;
 }

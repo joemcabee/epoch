@@ -27,6 +27,20 @@ const TimeTracker: React.FC = () => {
   const weekDays = getWeekDays(currentWeek);
   const filteredWeekDays = showWeekends ? weekDays : weekDays.filter((_, index) => index < 5);
 
+  // determine if the displayed week is the same as the current calendar week
+  const isDisplayingCurrentWeek = (() => {
+    const today = new Date();
+    const thisWeekStart = getWeekStart(today);
+    return thisWeekStart.getTime() === currentWeek.getTime();
+  })();
+
+  // flag for when the viewed week is before the current week
+  const isPastWeek = !isDisplayingCurrentWeek && currentWeek.getTime() < getWeekStart().getTime();
+
+  const goToCurrentWeek = () => {
+    setCurrentWeek(getWeekStart());
+  };
+
   useEffect(() => {
     try {
       loadWeekData();
@@ -282,7 +296,16 @@ const TimeTracker: React.FC = () => {
           <span className="week-display">
             {formatDate(weekDays[0])} - {formatDate(weekDays[showWeekends ? 6 : 4])}
           </span>
-          <button onClick={handleNextWeek}>Next &gt;</button>
+          {!isDisplayingCurrentWeek && (
+            <>
+              {isPastWeek && (
+                <button className="current-btn" onClick={goToCurrentWeek} title="Go to current week">
+                  Today
+                </button>
+              )}
+              <button onClick={handleNextWeek}>Next &gt;</button>
+            </>
+          )}
         </div>
         
         <div className="settings">
@@ -292,7 +315,7 @@ const TimeTracker: React.FC = () => {
               checked={showWeekends}
               onChange={(e) => setShowWeekends(e.target.checked)}
             />
-            <span className="checkbox-label">Show weekends (Saturday & Sunday)</span>
+            <span className="checkbox-label">Show weekends</span>
           </label>
           <button
             className="history-btn"
