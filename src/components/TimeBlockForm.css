@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--color-overlay-bg);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -13,10 +13,10 @@
 }
 
 .form-modal {
-  background: white;
+  background: var(--color-modal-bg);
   border-radius: 16px;
   padding: 30px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px var(--color-modal-shadow);
   max-width: 400px;
   width: 90%;
   animation: slideIn 0.3s ease-out;
@@ -35,7 +35,7 @@
 
 .form-modal h2 {
   margin: 0 0 25px 0;
-  color: #2c3e50;
+  color: var(--color-text-primary);
   font-size: 1.5rem;
   font-weight: 600;
   text-align: center;
@@ -48,7 +48,7 @@
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #34495e;
+  color: var(--color-text-primary);
   font-weight: 500;
   font-size: 14px;
 }
@@ -56,7 +56,7 @@
 .form-group input {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #ecf0f1;
+  border: 2px solid var(--color-border);
   border-radius: 8px;
   font-size: 16px;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -65,7 +65,7 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
@@ -91,22 +91,22 @@
 }
 
 .cancel-btn {
-  background: #ecf0f1;
-  color: #7f8c8d;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 .cancel-btn:hover {
-  background: #d5dbdb;
-  color: #2c3e50;
+  background: var(--color-border-hover);
+  color: var(--color-text-primary);
 }
 
 .submit-btn {
-  background: #27ae60;
-  color: white;
+  background: var(--color-success);
+  color: var(--color-text-inverse);
 }
 
 .submit-btn:hover {
-  background: #229954;
+  background: var(--color-success-hover);
   transform: translateY(-1px);
 }
 
