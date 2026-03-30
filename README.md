@@ -6,6 +6,7 @@ A modern React web application for tracking work time with browser storage. Buil
 
 - **Week View**: Display time blocks for each day of the week
 - **Time Block Management**: Add and remove time blocks with start/end times
+- **Daily Tasks**: Track simple name/completed tasks per date with a modal that mirrors the time block persistence.
 - **Daily & Weekly Totals**: See total time worked per day and for the entire week
 - **Browser Storage**: Data persists locally using localStorage
 - **Responsive Design**: Works on desktop and mobile devices
@@ -46,6 +47,13 @@ npm run dev
 2. Enter the start and end times
 3. Optionally add a description
 4. Click "Add Time Block" to save
+
+### Tracking Tasks
+
+1. Click the "Tasks" button for the day you want to capture work items
+2. Enter a task name, then hit **Add** (or press Enter) to store it
+3. Toggle the Completed checkbox in the modal to mark tasks done — changes are saved to the same localStorage layer shared with time blocks
+4. Click the trash icon to delete any task that is no longer needed
 
 ### Navigation
 

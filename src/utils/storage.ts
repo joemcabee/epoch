@@ -1,9 +1,10 @@
-import { WeekData, TimeBlock, ClockState, StandardTimeBlock } from '../types';
+import { WeekData, TimeBlock, ClockState, StandardTimeBlock, Task } from '../types';
 
 // Storage utility for time tracking data
 const STORAGE_KEY = 'epoch_time_data';
 const CLOCK_STATE_KEY = 'epoch_clock_state';
 const STANDARD_BLOCKS_KEY = 'epoch_standard_blocks';
+const TASK_DATA_KEY = 'epoch_task_data';
 
 // Helper function to sort time blocks by start time
 const sortTimeBlocks = (timeBlocks: TimeBlock[]): TimeBlock[] => {
@@ -13,6 +14,8 @@ const sortTimeBlocks = (timeBlocks: TimeBlock[]): TimeBlock[] => {
     return timeA - timeB;
   });
 };
+
+const generateId = (): string => Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
 export const getTimeData = (): Record<string, WeekData> => {
   try {
@@ -47,6 +50,63 @@ export const saveWeekData = (weekStart: Date, timeBlocks: WeekData): void => {
   saveTimeData(allData);
 };
 
+export const getTaskData = (): Record<string, Task[]> => {
+  try {
+    const data = localStorage.getItem(TASK_DATA_KEY);
+    return data ? JSON.parse(data) : {};
+  } catch (error) {
+    console.error('Error reading task data from localStorage:', error);
+    return {};
+  }
+};
+
+export const saveTaskData = (data: Record<string, Task[]>): void => {
+  try {
+    localStorage.setItem(TASK_DATA_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.error('Error saving task data to localStorage:', error);
+  }
+};
+
+export const getTasksForDate = (dateKey: string): Task[] => {
+  const taskData = getTaskData();
+  return taskData[dateKey] || [];
+};
+
+export const addTask = (dateKey: string, name: string): Task[] => {
+  const taskData = getTaskData();
+  const existingTasks = taskData[dateKey] || [];
+  const newTask: Task = {
+    id: generateId(),
+    name,
+    completed: false,
+  };
+  const updatedTasks = [...existingTasks, newTask];
+  taskData[dateKey] = updatedTasks;
+  saveTaskData(taskData);
+  return updatedTasks;
+};
+
+export const updateTask = (dateKey: string, taskId: string, updates: Partial<Task>): Task[] => {
+  const taskData = getTaskData();
+  const existingTasks = taskData[dateKey] || [];
+  const updatedTasks = existingTasks.map(task =>
+    task.id === taskId ? { ...task, ...updates } : task
+  );
+  taskData[dateKey] = updatedTasks;
+  saveTaskData(taskData);
+  return updatedTasks;
+};
+
+export const removeTask = (dateKey: string, taskId: string): Task[] => {
+  const taskData = getTaskData();
+  const existingTasks = taskData[dateKey] || [];
+  const updatedTasks = existingTasks.filter(task => task.id !== taskId);
+  taskData[dateKey] = updatedTasks;
+  saveTaskData(taskData);
+  return updatedTasks;
+};
+
 export const addTimeBlock = (weekStart: Date, dayIndex: number, timeBlock: Omit<TimeBlock, 'id'>): WeekData => {
   const weekData = getWeekData(weekStart);
   if (!weekData[dayIndex]) {
@@ -54,7 +114,7 @@ export const addTimeBlock = (weekStart: Date, dayIndex: number, timeBlock: Omit<
   }
   weekData[dayIndex].push({
     ...timeBlock,
-    id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
+    id: generateId()
   } as TimeBlock);
   
   // Sort time blocks by start time
@@ -116,7 +176,7 @@ export const clockIn = (weekStart: Date, dayIndex: number, startTime: string): {
   }
   
   const newBlock: TimeBlock = {
-    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+    id: generateId(),
     startTime,
     description: 'Active Session',
     isActive: true
@@ -189,4 +249,8 @@ export const clockOut = (weekStart: Date, dayIndex: number, blockId: string, end
 // Expose all stored weeks for history and analysis
 export const getAllWeekData = (): Record<string, WeekData> => {
   return getTimeData();
+};
+
+export const getAllTaskData = (): Record<string, Task[]> => {
+  return getTaskData();
 };

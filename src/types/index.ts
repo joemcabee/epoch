@@ -16,6 +16,12 @@ export interface TimeBlockFormData {
   description: string;
 }
 
+export interface Task {
+  id: string;
+  name: string;
+  completed: boolean;
+}
+
 export interface ClockState {
   isClockedIn: boolean;
   activeBlockId?: string;

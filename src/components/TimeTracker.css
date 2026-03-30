@@ -209,6 +209,25 @@
   background: var(--color-accent-hover);
 }
 
+.tasks-btn {
+  width: 100%;
+  background: var(--color-secondary);
+  color: var(--color-text-inverse);
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.2s;
+  margin-bottom: 0;
+}
+
+.tasks-btn:hover {
+  background: var(--color-secondary-hover);
+  transform: translateY(-1px);
+}
+
 .week-summary {
   text-align: center;
   padding: 20px;

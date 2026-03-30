@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { getWeekStart, getWeekDays, formatDate, isToday, formatTime, isFutureDate, getCurrentTime, getTimeInDecimalFormat } from '../utils/dateUtils';
-import { getWeekData, addTimeBlock, removeTimeBlock, updateTimeBlock, getClockState, clockIn, clockOut, getStandardBlocks, saveStandardBlocks, getAllWeekData } from '../utils/storage';
-import { TimeBlockFormData, WeekData, TimeBlock as TimeBlockType, ClockState, StandardTimeBlock } from '../types';
+import { getWeekData, addTimeBlock, removeTimeBlock, updateTimeBlock, getClockState, clockIn, clockOut, getStandardBlocks, saveStandardBlocks, getAllWeekData, getAllTaskData, addTask, updateTask, removeTask } from '../utils/storage';
+import { TimeBlockFormData, WeekData, TimeBlock as TimeBlockType, ClockState, StandardTimeBlock, Task } from '../types';
 import TimeBlockForm from './TimeBlockForm';
 import TimeBlock from './TimeBlock';
 import ClockInOut from './ClockInOut';
 import ConfigScreen from './ConfigScreen';
 import HistoryModal, { WeekHistoryEntry } from './HistoryModal';
+import TaskModal from './TaskModal';
 import './TimeTracker.css';
 
 const TimeTracker: React.FC = () => {
@@ -23,6 +24,9 @@ const TimeTracker: React.FC = () => {
   const [historyEntries, setHistoryEntries] = useState<WeekHistoryEntry[]>([]);
   const [historyPage, setHistoryPage] = useState<number>(1);
   const HISTORY_PAGE_SIZE = 4;
+  const [taskData, setTaskData] = useState<Record<string, Task[]>>({});
+  const [showTaskModal, setShowTaskModal] = useState<boolean>(false);
+  const [taskModalDate, setTaskModalDate] = useState<string | null>(null);
 
   const weekDays = getWeekDays(currentWeek);
   const filteredWeekDays = showWeekends ? weekDays : weekDays.filter((_, index) => index < 5);
@@ -46,6 +50,7 @@ const TimeTracker: React.FC = () => {
       loadWeekData();
       loadClockState();
       setStandardBlocks(getStandardBlocks());
+      loadTaskData();
     } catch (error) {
       console.error('Error loading data:', error);
       // Optionally show user-friendly error message
@@ -70,6 +75,11 @@ const TimeTracker: React.FC = () => {
       console.error('Failed to load week data:', error);
       setWeekData([]);
     }
+  };
+
+  const loadTaskData = () => {
+    const data = getAllTaskData();
+    setTaskData(data);
   };
 
   const loadClockState = () => {
@@ -274,6 +284,44 @@ const TimeTracker: React.FC = () => {
     setWeekData(updatedData);
   };
 
+  const openTaskModal = (day: Date) => {
+    const dateKey = day.toLocaleDateString('en-CA');
+    setTaskModalDate(dateKey);
+    setShowTaskModal(true);
+  };
+
+  const closeTaskModal = () => {
+    setShowTaskModal(false);
+    setTaskModalDate(null);
+  };
+
+  const handleAddTaskForDate = (name: string) => {
+    if (!taskModalDate) return;
+    const updatedTasks = addTask(taskModalDate, name);
+    setTaskData(prev => ({
+      ...prev,
+      [taskModalDate]: updatedTasks,
+    }));
+  };
+
+  const handleTaskCompletionToggle = (taskId: string, completed: boolean) => {
+    if (!taskModalDate) return;
+    const updatedTasks = updateTask(taskModalDate, taskId, { completed });
+    setTaskData(prev => ({
+      ...prev,
+      [taskModalDate]: updatedTasks,
+    }));
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    if (!taskModalDate) return;
+    const updatedTasks = removeTask(taskModalDate, taskId);
+    setTaskData(prev => ({
+      ...prev,
+      [taskModalDate]: updatedTasks,
+    }));
+  };
+
   return (
     <div className="time-tracker">
       <div className="header">
@@ -323,11 +371,13 @@ const TimeTracker: React.FC = () => {
 
       <div className={`week-view ${!showWeekends ? 'weekdays-only' : ''}`}>
         {filteredWeekDays.map((day, dayIndex) => {
+          const dayKey = day.toLocaleDateString('en-CA');
           const dayBlocks = weekData[dayIndex] || [];
           const dayTotal = calculateDayTotal(dayIndex);
           const isCurrentDay = isToday(day);
           const isFutureDay = isFutureDate(day);
           const dayTotalInDecimal = getTimeInDecimalFormat(dayTotal);
+          const tasksForDay = taskData[dayKey] || [];
 
           return (
             <div 
@@ -378,6 +428,13 @@ const TimeTracker: React.FC = () => {
                   + Add Standard Blocks
                 </button>
               )}
+              
+              <button
+                className="tasks-btn"
+                onClick={() => openTaskModal(day)}
+              >
+                Tasks{tasksForDay.length > 0 ? ` (${tasksForDay.length})` : ''}
+              </button>
             </div>
           );
         })}
@@ -419,6 +476,17 @@ const TimeTracker: React.FC = () => {
           onClose={() => setShowHistory(false)}
           onLoadMore={handleLoadMoreHistory}
           hasMore={hasMoreHistory}
+        />
+      )}
+
+      {showTaskModal && taskModalDate && (
+        <TaskModal
+          dateLabel={formatDate(new Date(`${taskModalDate}T00:00:00`))}
+          tasks={taskData[taskModalDate] || []}
+          onAddTask={handleAddTaskForDate}
+          onToggleTaskCompletion={handleTaskCompletionToggle}
+          onClose={closeTaskModal}
+          onDeleteTask={handleDeleteTask}
         />
       )}
     </div>
