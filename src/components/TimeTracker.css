@@ -136,6 +136,8 @@
   border: 2px solid var(--color-border);
   transition: all 0.2s ease;
   min-height: 400px;
+  display: flex;
+  flex-direction: column;
 }
 
 .day-column:hover {
@@ -171,6 +173,7 @@
 .time-blocks {
   margin-bottom: 20px;
   min-height: 200px;
+  flex: 1;
 }
 
 .add-block-btn {
