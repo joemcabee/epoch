@@ -20,7 +20,7 @@ const ClockInOut: React.FC<ClockInOutProps> = ({
   }
 
   return (
-    <div className="clock-in-out">
+    <>
       {clockState.isClockedIn ? (
         <button 
           className="clock-out-btn"
@@ -38,7 +38,7 @@ const ClockInOut: React.FC<ClockInOutProps> = ({
           ▶️ Clock In
         </button>
       )}
-    </div>
+    </>
   );
 };
 

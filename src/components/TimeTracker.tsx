@@ -404,37 +404,41 @@ const TimeTracker: React.FC = () => {
                 ))}
               </div>
               
-              <ClockInOut
-                isCurrentDay={isCurrentDay}
-                clockState={clockState}
-                onClockIn={handleClockIn}
-                onClockOut={handleClockOut}
-              />
+              <div className="button-group">
+                <ClockInOut
+                  isCurrentDay={isCurrentDay}
+                  clockState={clockState}
+                  onClockIn={handleClockIn}
+                  onClockOut={handleClockOut}
+                />
 
-              {!isFutureDay && (
-                <button 
-                  className="add-block-btn"
-                  onClick={() => handleDayClick(dayIndex)}
-                >
-                  + Add Time Block
-                </button>
-              )}
-              
-              {!isFutureDay && standardBlocks.length > 0 && (
-                <button
-                  className="add-standard-btn"
-                  onClick={() => handleAddStandardBlocks(dayIndex)}
-                >
-                  + Add Standard Blocks
-                </button>
-              )}
-              
-              <button
-                className="tasks-btn"
-                onClick={() => openTaskModal(day)}
-              >
-                Tasks{tasksForDay.length > 0 ? ` (${tasksForDay.length})` : ''}
-              </button>
+                {!isFutureDay && (
+                  <>
+                    <button 
+                      className="mt-2 add-block-btn"
+                      onClick={() => handleDayClick(dayIndex)}
+                    >
+                      + Add Time Block
+                    </button>
+                
+                    {standardBlocks.length > 0 && (
+                      <button
+                        className="mt-2 add-standard-btn"
+                        onClick={() => handleAddStandardBlocks(dayIndex)}
+                      >
+                        + Add Standard Blocks
+                      </button>
+                    )}
+                  
+                    <button
+                      className="mt-2 tasks-btn"
+                      onClick={() => openTaskModal(day)}
+                    >
+                      Tasks{tasksForDay.length > 0 ? ` (${tasksForDay.length})` : ''}
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           );
         })}

@@ -184,7 +184,6 @@
   font-size: 14px;
   font-weight: 500;
   transition: background-color 0.2s;
-  margin-bottom: 12px;
 }
 
 .add-block-btn:hover {
@@ -202,7 +201,6 @@
   font-size: 14px;
   font-weight: 500;
   transition: background-color 0.2s;
-  margin-bottom: 12px;
 }
 
 .add-standard-btn:hover {
@@ -220,7 +218,6 @@
   font-size: 14px;
   font-weight: 500;
   transition: background-color 0.2s, transform 0.2s;
-  margin-bottom: 0;
 }
 
 .tasks-btn:hover {
